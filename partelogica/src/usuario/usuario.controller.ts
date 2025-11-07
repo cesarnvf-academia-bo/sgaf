@@ -1,7 +1,9 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Punto de Acceso usuario')
 @Controller('api/v1/usuario')
 export class UsuarioController {
 
@@ -9,16 +11,22 @@ export class UsuarioController {
         private readonly usuarioServicio: UsuarioService,
     ) { }
 
+    @ApiOperation({ summary: 'Lista a todos los usuario' })
+    @ApiResponse({ status: 200, description: 'Lista generada exitosamente.' })
     @Get()
     obtenerTodos() {
         return this.usuarioServicio.obtenerTodos();
     }
 
+    @ApiOperation({ summary: 'Lista a un solo usuario' })
+    @ApiResponse({ status: 200, description: 'Lista generada exitosamente.' })
     @Get(':id')
     obtenerPorId(@Param('id', ParseIntPipe) id: number) {
         return this.usuarioServicio.obtenerPorId(id);
     }
 
+    @ApiOperation({ summary: 'Adiciona un usuario' })
+    @ApiResponse({ status: 200, description: 'Creacion exitosamente.' })
     @Post()
     adicionar(@Body() datos: Partial<Usuario>) {
         return this.usuarioServicio.adicionar(datos);
