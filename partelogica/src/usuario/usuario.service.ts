@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './usuario';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsuarioService {
@@ -22,9 +23,9 @@ export class UsuarioService {
     }
 
     async adicionar(datos: Partial<Usuario>) {
-        /* if (datos.clave) {
+        if (datos.clave) {
             datos.clave = await bcrypt.hash(datos.clave, 10);
-        } */
+        }
         const nuevo = this.usuarioRepository.create(datos);
         return await this.usuarioRepository.save(nuevo);
     }
@@ -34,9 +35,9 @@ export class UsuarioService {
         if (!dato) {
             throw new NotFoundException(`Usuario con id ${id} no encontrado`);
         }
-        /* if (datos.clave) {
+        if (datos.clave) {
             datos.clave = await bcrypt.hash(datos.clave, 10);
-        } */
+        }
         Object.assign(dato, datos);
         return await this.usuarioRepository.save(dato);
     }
@@ -47,5 +48,10 @@ export class UsuarioService {
             throw new NotFoundException(`Usuario con id ${id} no encontrado`);
         }
         return { mensaje: `Usuario con id ${id} borrado correctamente` }
+    }
+
+    async obtenerPorUsuario(usuario: string) {
+        const dato = await this.usuarioRepository.findOne({ where: { usuario } });
+        return dato;
     }
 }
