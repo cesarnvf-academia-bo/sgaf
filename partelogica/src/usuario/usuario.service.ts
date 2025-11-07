@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './usuario';
 import { Repository } from 'typeorm';
@@ -14,5 +14,38 @@ export class UsuarioService {
     async obtenerTodos() {
         const dato = await this.usuarioRepository.find();
         return dato;
+    }
+
+    async obtenerPorId(id: number) {
+        const dato = await this.usuarioRepository.findOne({ where: { id } });
+        return dato;
+    }
+
+    async adicionar(datos: Partial<Usuario>) {
+        /* if (datos.clave) {
+            datos.clave = await bcrypt.hash(datos.clave, 10);
+        } */
+        const nuevo = this.usuarioRepository.create(datos);
+        return await this.usuarioRepository.save(nuevo);
+    }
+
+    async modificar(id: number, datos: Partial<Usuario>) {
+        const dato = await this.usuarioRepository.findOne({ where: { id } });
+        if (!dato) {
+            throw new NotFoundException(`Usuario con id ${id} no encontrado`);
+        }
+        /* if (datos.clave) {
+            datos.clave = await bcrypt.hash(datos.clave, 10);
+        } */
+        Object.assign(dato, datos);
+        return await this.usuarioRepository.save(dato);
+    }
+
+    async borrarPorId(id: number) {
+        const resultado = await this.usuarioRepository.delete(id);
+        if (resultado.affected === 0) {
+            throw new NotFoundException(`Usuario con id ${id} no encontrado`);
+        }
+        return { mensaje: `Usuario con id ${id} borrado correctamente` }
     }
 }
